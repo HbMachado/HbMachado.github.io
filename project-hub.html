@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Hub</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .bg-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#fca5a5 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="w-full bg-white shadow-sm border-b border-red-100">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                    P
+                </div>
+                <span class="text-slate-800 font-semibold text-lg">Project Hub</span>
+            </div>
+            <button id="manageBtn" class="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                Gerenciar Projetos
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6">
+        <div class="max-w-6xl w-full">
+
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-extrabold text-red-700 mb-2 tracking-tight">
+                    Project Hub
+                </h1>
+                <p class="text-slate-600 text-lg">Todos os seus projetos em um único lugar</p>
+            </div>
+
+            <!-- Projects Grid -->
+            <div id="projectsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards will be generated here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="text-center py-12">
+                <i data-lucide="inbox" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
+                <p class="text-slate-500 text-lg">Nenhum projeto adicionado ainda.</p>
+                <button id="emptyAddBtn" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    Adicionar Primeiro Projeto
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-6 text-slate-500 text-sm">
+        <p>&copy; 2026 Project Hub. Todos os direitos reservados.</p>
+    </footer>
+
+    <!-- Manage Projects Modal -->
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-96 flex flex-col overflow-hidden">
+            <div class="p-6 border-b border-slate-200">
+                <h2 class="text-2xl font-bold text-slate-800">Gerenciar Projetos</h2>
+                <p class="text-slate-600 text-sm mt-1">Adicione, edite ou remova projetos</p>
+            </div>
+
+            <div class="overflow-y-auto flex-grow p-6">
+                <div id="projectsList" class="space-y-4">
+                    <!-- Projects list will be generated here -->
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-slate-200 flex gap-3">
+                <button id="addNewBtn" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium flex items-center justify-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    Novo Projeto
+                </button>
+                <button id="closeModal" class="flex-1 px-4 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors font-medium">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Project Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md">
+            <div class="p-6 border-b border-slate-200">
+                <h2 id="editTitle" class="text-2xl font-bold text-slate-800">Novo Projeto</h2>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Título</label>
+                    <input id="projectTitle" type="text" placeholder="Ex: Solução Gestão"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-red-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">URL</label>
+                    <input id="projectUrl" type="url" placeholder="Ex: https://exemplo.com"
+                           class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-red-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Descrição (opcional)</label>
+                    <textarea id="projectDescription" placeholder="Ex: Descrição breve do projeto"
+                              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-red-500 resize-none" rows="3"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Ícone</label>
+                    <select id="projectIcon" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-red-500">
+                        <option value="app-window">App Window</option>
+                        <option value="file-code-2">File Code</option>
+                        <option value="bot">Bot</option>
+                        <option value="briefcase">Briefcase</option>
+                        <option value="layers">Layers</option>
+                        <option value="zap">Zap</option>
+                        <option value="database">Database</option>
+                        <option value="cloud">Cloud</option>
+                        <option value="settings">Settings</option>
+                        <option value="check-square">Check Square</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="p-6 border-t border-slate-200 flex gap-3">
+                <button id="saveProject" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    Salvar
+                </button>
+                <button id="cancelEdit" class="flex-1 px-4 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors font-medium">
+                    Cancelar
+                </button>
+                <button id="deleteProject" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors font-medium hidden">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // EDIT THIS SECTION TO ADD/REMOVE PROJECTS
+        // ============================================
+        const PROJECTS = [
+            {
+                id: 1,
+                title: "Solução Gestão - desenvolvimento",
+                url: "Gestão01.html",
+                description: "Plataforma de gestão de projetos e recursos",
+                icon: "app-window"
+            },
+            {
+                id: 2,
+                title: "Solução executiva comercial/expansão",
+                url: "Proposta01.html",
+                description: "Dashboard executivo para análise comercial",
+                icon: "file-code-2"
+            },
+            {
+                id: 3,
+                title: "Projeto IA",
+                url: "IAProject.html",
+                description: "Projetos e experimentos com inteligência artificial",
+                icon: "bot"
+            }
+        ];
+        // ============================================
+
+        let projects = [...PROJECTS];
+        let editingId = null;
+
+        const projectsGrid = document.getElementById('projectsGrid');
+        const emptyState = document.getElementById('emptyState');
+        const modal = document.getElementById('modal');
+        const editModal = document.getElementById('editModal');
+        const manageBtn = document.getElementById('manageBtn');
+        const closeModal = document.getElementById('closeModal');
+        const cancelEdit = document.getElementById('cancelEdit');
+        const addNewBtn = document.getElementById('addNewBtn');
+        const emptyAddBtn = document.getElementById('emptyAddBtn');
+        const saveProject = document.getElementById('saveProject');
+        const deleteProject = document.getElementById('deleteProject');
+
+        // Render projects
+        function renderProjects() {
+            projectsGrid.innerHTML = '';
+
+            if (projects.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            projects.forEach(project => {
+                const card = document.createElement('a');
+                card.href = project.url;
+                card.target = "_blank";
+                card.rel = "noopener noreferrer";
+                card.className = "group block bg-white rounded-2xl border border-red-100 p-8 shadow-sm hover:shadow-xl hover:border-red-400 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden cursor-pointer";
+
+                card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-full h-1 bg-red-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-14 h-14 bg-red-50 rounded-xl flex items-center justify-center text-red-600 group-hover:bg-red-600 group-hover:text-white transition-colors duration-300">
+                            <i data-lucide="${project.icon}" class="w-7 h-7"></i>
+                        </div>
+                        <i data-lucide="external-link" class="w-5 h-5 text-slate-400 group-hover:text-red-500 transition-colors"></i>
+                    </div>
+
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">${project.title}</h2>
+                    ${project.description ? `<p class="text-slate-600 text-sm mb-4">${project.description}</p>` : ''}
+
+                    <div class="flex items-center text-red-600 font-semibold text-sm">
+                        <span>Acessar página</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform"></i>
+                    </div>
+                `;
+
+                projectsGrid.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Render projects list in modal
+        function renderProjectsList() {
+            const projectsList = document.getElementById('projectsList');
+            projectsList.innerHTML = '';
+
+            projects.forEach(project => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors";
+                item.innerHTML = `
+                    <div class="flex-1">
+                        <h3 class="font-medium text-slate-800">${project.title}</h3>
+                        <p class="text-sm text-slate-500">${project.url}</p>
+                    </div>
+                    <button class="ml-4 px-3 py-1 text-sm bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors" onclick="openEdit(${project.id})">
+                        Editar
+                    </button>
+                `;
+                projectsList.appendChild(item);
+            });
+        }
+
+        // Open manage modal
+        manageBtn.addEventListener('click', () => {
+            renderProjectsList();
+            modal.classList.remove('hidden');
+        });
+
+        emptyAddBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            renderProjectsList();
+        });
+
+        closeModal.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        // Open add/edit modal
+        addNewBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            openEdit(null);
+        });
+
+        function openEdit(id) {
+            editingId = id;
+            const editTitle = document.getElementById('editTitle');
+            const deleteBtn = document.getElementById('deleteProject');
+
+            if (id === null) {
+                editTitle.textContent = 'Novo Projeto';
+                document.getElementById('projectTitle').value = '';
+                document.getElementById('projectUrl').value = '';
+                document.getElementById('projectDescription').value = '';
+                document.getElementById('projectIcon').value = 'app-window';
+                deleteBtn.classList.add('hidden');
+            } else {
+                const project = projects.find(p => p.id === id);
+                editTitle.textContent = 'Editar Projeto';
+                document.getElementById('projectTitle').value = project.title;
+                document.getElementById('projectUrl').value = project.url;
+                document.getElementById('projectDescription').value = project.description || '';
+                document.getElementById('projectIcon').value = project.icon;
+                deleteBtn.classList.remove('hidden');
+            }
+
+            editModal.classList.remove('hidden');
+        }
+
+        cancelEdit.addEventListener('click', () => {
+            editModal.classList.add('hidden');
+            editingId = null;
+        });
+
+        // Save project
+        saveProject.addEventListener('click', () => {
+            const title = document.getElementById('projectTitle').value.trim();
+            const url = document.getElementById('projectUrl').value.trim();
+            const description = document.getElementById('projectDescription').value.trim();
+            const icon = document.getElementById('projectIcon').value;
+
+            if (!title || !url) {
+                alert('Preencha título e URL');
+                return;
+            }
+
+            if (editingId === null) {
+                const newId = Math.max(...projects.map(p => p.id), 0) + 1;
+                projects.push({ id: newId, title, url, description, icon });
+            } else {
+                const project = projects.find(p => p.id === editingId);
+                project.title = title;
+                project.url = url;
+                project.description = description;
+                project.icon = icon;
+            }
+
+            renderProjects();
+            editModal.classList.add('hidden');
+            editingId = null;
+        });
+
+        // Delete project
+        deleteProject.addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja remover este projeto?')) {
+                projects = projects.filter(p => p.id !== editingId);
+                renderProjects();
+                editModal.classList.add('hidden');
+                editingId = null;
+            }
+        });
+
+        // Close modals on background click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.add('hidden');
+        });
+
+        editModal.addEventListener('click', (e) => {
+            if (e.target === editModal) {
+                editModal.classList.add('hidden');
+                editingId = null;
+            }
+        });
+
+        // Initial render
+        renderProjects();
+        lucide.createIcons();
+    </script>
+</body>
+</html>
